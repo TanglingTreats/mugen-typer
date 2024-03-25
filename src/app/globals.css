@@ -5,6 +5,7 @@
 :root {
   --fg-rgb: #d79921;
   --bg-rgb: #282828;
+  --err-fg-rgb: #ff4056;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 }
@@ -22,8 +23,40 @@ body {
   background: var(--bg-rgb);
 }
 
+.challenge {
+  color: #4d4d4d;
+  opacity: 80%;
+}
+
+.try {
+  color: var(--fg-rgb);
+}
+
+.err-try {
+  color: var(--err-fg-rgb);
+}
+
+.hidden-text-input {
+  color: transparent;
+  background-color: transparent;
+  opacity: 0;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
 }
+
+::-webkit-scrollbar {
+  /* Customize the scrollbar width */
+  display: none;
+}
+
+/* ::-webkit-scrollbar-track { */
+/* Customize the scrollbar track */
+/* } */
+
+/* ::-webkit-scrollbar-thumb { */
+/* Customize the scrollbar thumb */
+/* } */
