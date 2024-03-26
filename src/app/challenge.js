@@ -29,13 +29,10 @@ export default function Challenge(props) {
       key: "F",
       value: "G",
       isRight: false
-    },
-    {
-      key: "T",
-      value: "T",
-      isRight: true
     }
   ]);
+
+  const [currChallenge, currChallengeState] = useState(["T"]);
 
   const [scrollHeight, scrollHeightState] = useState(0);
   const challengeBoxRef = useRef(null);
@@ -84,7 +81,7 @@ export default function Challenge(props) {
   // Push text into span
   return (
     <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef}>
-      <p className={`text-left challenge`} >{answer.map(ansToString)}<word className="">{ansCheck.map(ansCheckToString)}</word><Caret />{challenge.map(challengeToString)}</p>
+      <p className={`text-left challenge`} >{answer.map(ansToString)}<word className="">{ansCheck.map(ansCheckToString)}</word><Caret />{currChallenge}{challenge.map(challengeToString)}</p>
       <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} ref={answerBox} />
     </div>
   )
