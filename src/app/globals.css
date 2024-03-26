@@ -51,6 +51,36 @@ word:nth-child(7n+7)::after {
   white-space: pre;
 }
 
+caret {
+  border-color: var(--fg-rgb);
+  border-style: solid;
+  border-width: 1.8px;
+  border-radius: 19%;
+
+  animation-name: caret-blink;
+  animation-duration: 0.8s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in;
+}
+
+@keyframes caret-blink {
+  0% {
+    opacity: 100%;
+  }
+
+  50% {
+    opacity: 0%
+  }
+
+  75% {
+    opacity: 100%;
+  }
+
+  100% {
+    opacity: 100%;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
