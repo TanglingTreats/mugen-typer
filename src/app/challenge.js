@@ -1,5 +1,5 @@
 "use client"
-import { createElement, useEffect, useState, useRef } from "react"
+import { createElement, useEffect, useState, useRef, useReducer } from "react"
 import Caret from "./caret.js"
 
 export default function Challenge(props) {
@@ -9,12 +9,12 @@ export default function Challenge(props) {
    *  Current challenge string
    */
   const challengeStr = "crypto decentralized meme stock stonk hodl ape GameStop AMC Reddit Robinhood Dogecoin elon tesla Twitter Muskrat quiet quitting great resignation quiet firing layoff recession inflation cost of living supply chain chip shortage climate crisis heat wave drought fire season net zero green energy EV plant-based oat milk cauliflower gnocchi charcuterie grazing board cheugy cringe slay zaddy bussy thirst trap y'all cap no cap fr fr wig go off understood the assignment hot girl walk feral girl summer that's the tweet main character energy unalive sadfishing negging love-bombing gatekeeping cloutlighting sliving going goblin mode crisitunity ambient anxiety";
-  const [challenge, challengeState] = useState(challengeStr.split(" "));
+  const [challenge, setChallenge] = useState(challengeStr.split(" "));
 
   /**
    * State of all answers
    */
-  const [answer, ansState] = useState([
+  const [answer, setAnswer] = useState([
     {
       key: "metaverse",
       value: "metaqeroe",
@@ -33,12 +33,12 @@ export default function Challenge(props) {
   /**
    * Current word challenge
    */
-  const [currChallenge, currChallengeState] = useState(["T"]);
+  const [currChallenge, setCurrChallenge] = useState(["T"]);
 
   /**
    * State of answer after typing
    */
-  const [ansCheck, ansCheckState] = useState([
+  const [ansCheck, setAnsCheck] = useState([
     {
       key: "N",
       value: "N",
@@ -58,6 +58,31 @@ export default function Challenge(props) {
   useEffect(() => {
     challengeBoxRef.current.scrollTo = 50;
   }, [answer]);
+
+  function handleAddAns(key, input) {
+    dispatch({
+      type: "add",
+      key: key,
+      value: input
+    });
+  }
+
+  function handleDeleteAns() {
+    dispatch({
+      type: "delete",
+    });
+  }
+
+  function ansCheckReducer(state, action) {
+    switch (action.type) {
+      case "add":
+        console.log("adding letter");
+        break;
+      case "delete":
+        console.log("deleting letter");
+        break;
+    }
+  }
 
   function handleOnClick() {
     answerBox.current.focus();
@@ -103,10 +128,12 @@ export default function Challenge(props) {
     * @param e {Event}
     */
   function handleAnswer(e) {
-    if (e.target.value === " ") {
-      console.log("confirm answer");
-      console.log(globalIndex);
+    if (e.target.value.includes(" ")) {
+      // Pop all in currChallenge into answer with right/wrong state
       globIndexState((g) => ++g)
+    } else {
+      console.log("handling input", e.target.value);
+      answerBox.current.value = "";
     }
   }
 
@@ -114,7 +141,7 @@ export default function Challenge(props) {
   return (
     <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef}>
       <p className={`text-left challenge`} >{answer.map(ansToString)}<word className="">{ansCheck.map(ansCheckToHtml)}</word><Caret />{currChallenge}{challenge.map(challengeToHtml)}</p>
-      <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} ref={answerBox} />
+      <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} maxLength={1} ref={answerBox} />
     </div>
   )
 }
