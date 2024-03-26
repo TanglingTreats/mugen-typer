@@ -1,5 +1,6 @@
 "use client"
 import { createElement, useEffect, useState, useRef } from "react"
+import Caret from "./caret.js"
 
 export default function Challenge(props) {
   const [globalIndex, globIndexState] = useState(0);
@@ -83,7 +84,7 @@ export default function Challenge(props) {
   // Push text into span
   return (
     <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef}>
-      <p className={`text-left challenge`} ><caret></caret>{answer.map(ansToString)}<word className="">{ansCheck.map(ansCheckToString)}</word>{challenge.map(challengeToString)}</p>
+      <p className={`text-left challenge`} >{answer.map(ansToString)}<word className="">{ansCheck.map(ansCheckToString)}</word><Caret />{challenge.map(challengeToString)}</p>
       <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} ref={answerBox} />
     </div>
   )

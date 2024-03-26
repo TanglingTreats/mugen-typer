@@ -11,7 +11,9 @@ export default function Home() {
       <Challenge className="relative flex place-items-start justify-center text-2xl w-7/12 -mt-14 h-64 overflow-hidden font-mono" />
 
       <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left text-white">
-        <p>Theme: Gruvbox. Still a WIP. Thanks for visiting</p>
+        <p>Theme: Gruvbox. Still a WIP.</p>
+        <p>Thanks for visiting</p>
+        <p>Backend not yet connected</p>
       </div>
     </main>
   );
