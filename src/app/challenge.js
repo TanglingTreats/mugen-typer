@@ -30,15 +30,15 @@ export default function Challenge(props) {
     }
   ]);
 
-  /**
-   * Current word challenge
-   */
-  const [currChallenge, setCurrChallenge] = useState(["T"]);
+  const [scrollHeight, scrollHeightState] = useState(0);
+  const challengeBoxRef = useRef(null);
+  const answerBox = useRef(null);
 
-  /**
-   * State of answer after typing
-   */
-  const [ansCheck, setAnsCheck] = useState([
+  useEffect(() => {
+    challengeBoxRef.current.scrollTo = 50;
+  }, [answer]);
+
+  const initChallengeCheck = [
     {
       key: "N",
       value: "N",
@@ -48,16 +48,18 @@ export default function Challenge(props) {
       key: "F",
       value: "G",
       isRight: false
+    },
+    {
+      key: "T",
+      value: "",
+      isRight: false
     }
-  ]);
+  ]
 
-  const [scrollHeight, scrollHeightState] = useState(0);
-  const challengeBoxRef = useRef(null);
-  const answerBox = useRef(null);
-
-  useEffect(() => {
-    challengeBoxRef.current.scrollTo = 50;
-  }, [answer]);
+  /**
+   * Challenge-Answer reducer to consolidate text actions
+   */
+  const [challengeAnswer, dispatch] = useReducer(ansCheckReducer, initChallengeCheck);
 
   function handleAddAns(key, input) {
     dispatch({
@@ -73,14 +75,37 @@ export default function Challenge(props) {
     });
   }
 
-  function ansCheckReducer(state, action) {
+  function ansCheckReducer(ansChecks, action) {
     switch (action.type) {
       case "add":
-        console.log("adding letter");
-        break;
+        if (action.key !== null) {
+          return ansChecks.map((ac, index) => {
+            if (ac.key === action.key) {
+              ac.value = action.value;
+              ac.isRight = action.key === action.value;
+            }
+            return ac;
+          });
+        } else {
+          return [...ansChecks, { key: "", value: action.value, isRight: false }];
+        }
       case "delete":
-        console.log("deleting letter");
-        break;
+        let lastElem = ansChecks[ansChecks.length - 1];
+        if (lastElem.key === "") {
+          ansChecks.pop();
+        } else {
+          lastElem = ansChecks.findLast((ac) => ac.value !== "");
+          if (lastElem != null) {
+            lastElem.value = "";
+          }
+        }
+        return [...ansChecks];
+    }
+  }
+
+  function handleKeypress(event) {
+    if (event.keyCode === 8) {
+      handleDeleteAns();
     }
   }
 
@@ -108,9 +133,14 @@ export default function Challenge(props) {
    *  @param index {number}
    */
   function ansCheckToHtml(answerChar, index) {
-    if (answerChar.key === " ") return;
-    return <letter key={index}
-      className={answerChar.isRight ? "try" : "err-try underline"}>{answerChar.value}</letter>;
+    if (answerChar.key === " " || answerChar.value === "") return;
+    return <span key={index}
+      className={answerChar.isRight ? "try" : "err-try underline"}>{answerChar.value}</span>;
+  }
+
+  function currChallengeToHtml(currChallenge, index) {
+    if (!(currChallenge.value === "")) return;
+    return currChallenge.key;
   }
 
   /**
@@ -132,16 +162,43 @@ export default function Challenge(props) {
       // Pop all in currChallenge into answer with right/wrong state
       globIndexState((g) => ++g)
     } else {
-      console.log("handling input", e.target.value);
+      const ansChar = e.target.value;
+      const challenge = challengeAnswer.find((ca) => ca.value === "");
+      const currChar = challenge ? challenge.key : null;
+
+      handleAddAns(currChar, ansChar)
+
       answerBox.current.value = "";
     }
+  }
+
+  function displayAnswerCheck() {
+    const arr = challengeAnswer.map(ansCheckToHtml);
+    if (arr[0] !== undefined) {
+      return (<word className="">{arr}</word>);
+    }
+    return;
+  }
+
+  function displayCurrentChallenge() {
+    const arr = challengeAnswer.map(currChallengeToHtml);
+    if (arr[0] !== undefined) {
+      return (<word className="">{arr}</word>);
+    }
+    return;
   }
 
   // Push text into span
   return (
     <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef}>
-      <p className={`text-left challenge`} >{answer.map(ansToString)}<word className="">{ansCheck.map(ansCheckToHtml)}</word><Caret />{currChallenge}{challenge.map(challengeToHtml)}</p>
-      <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} maxLength={1} ref={answerBox} />
+      <p className={`text-left challenge`} >
+        {answer.map(ansToString)}
+        {displayAnswerCheck()}
+        <Caret />
+        {displayCurrentChallenge()}
+        {challenge.map(challengeToHtml)}
+      </p>
+      <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
     </div>
   )
 }
