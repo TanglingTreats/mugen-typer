@@ -5,7 +5,7 @@
 :root {
   --fg-rgb: #d79921;
   --bg-rgb: #282828;
-  --err-fg-rgb: #ff4056;
+  --err-fg-rgb: #fb4934;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 }
@@ -44,6 +44,7 @@ body {
 
 word {
   margin: 0.25rem;
+  padding: 0.25rem 0;
 }
 
 word:nth-child(7n+7)::after {
