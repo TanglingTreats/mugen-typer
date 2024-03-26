@@ -40,12 +40,11 @@ export default function Challenge(props) {
   const challengeBoxRef = useRef(null);
   const answerBox = useRef(null);
 
-  function handleKeypress(event) {
-    console.log(String.fromCharCode(event.keyCode));
-  }
+  useEffect(() => {
+    challengeBoxRef.current.scrollTo = 50;
+  }, [answer]);
 
   function handleOnClick() {
-    console.log("listening for keypresses.");
     answerBox.current.focus();
   }
 
@@ -59,7 +58,7 @@ export default function Challenge(props) {
         htmlContent.push(c);
       }
     });
-    const ansWord = createElement("word", { key: index, className: 'm-1' }, htmlContent);
+    const ansWord = createElement("word", { key: index, className: 'try' }, htmlContent);
     return ansWord;
   }
 
@@ -70,21 +69,21 @@ export default function Challenge(props) {
   }
 
   function challengeToString(challenge, index) {
-    return <word className="m-1" key={index}>{challenge}</word>
+    return <word className="" key={index}>{challenge}</word>
   }
 
-  useEffect(() => {
-    challengeBoxRef.current.scrollTo = 50;
-  }, [answer]);
-
   function handleAnswer(e) {
-    // console.log(e.target.value);
+    if (e.target.value === " ") {
+      console.log("confirm answer");
+      console.log(globalIndex);
+      globIndexState((g) => ++g)
+    }
   }
 
   // Push text into span
   return (
     <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef}>
-      <p className={`text-left challenge`} ><span className="try">{answer.map(ansToString)}</span><word className="m-1">{ansCheck.map(ansCheckToString)}</word>{challenge.map(challengeToString)}</p>
+      <p className={`text-left challenge`} >{answer.map(ansToString)}<word className="">{ansCheck.map(ansCheckToString)}</word>{challenge.map(challengeToString)}</p>
       <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} ref={answerBox} />
     </div>
   )

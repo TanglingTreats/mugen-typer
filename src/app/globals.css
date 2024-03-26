@@ -42,7 +42,11 @@ body {
   opacity: 0;
 }
 
-word:nth-child(5n+5)::after {
+word {
+  margin: 0.25rem;
+}
+
+word:nth-child(7n+7)::after {
   content: "\a";
   white-space: pre;
 }
