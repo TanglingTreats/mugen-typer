@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useRef } from "react"
+import { createElement, useEffect, useState, useRef } from "react"
 
 export default function Challenge(props) {
   const [globalIndex, globIndexState] = useState(0);
@@ -7,15 +7,16 @@ export default function Challenge(props) {
   const challengeStr = "crypto decentralized meme stock stonk hodl ape GameStop AMC Reddit Robinhood Dogecoin elon tesla Twitter Muskrat quiet quitting great resignation quiet firing layoff recession inflation cost of living supply chain chip shortage climate crisis heat wave drought fire season net zero green energy EV plant-based oat milk cauliflower gnocchi charcuterie grazing board cheugy cringe slay zaddy bussy thirst trap y'all cap no cap fr fr wig go off understood the assignment hot girl walk feral girl summer that's the tweet main character energy unalive sadfishing negging love-bombing gatekeeping cloutlighting sliving going goblin mode crisitunity ambient anxiety";
   const [challenge, challengeState] = useState(challengeStr.split(" "));
 
-  function ansTestToMap(c, i) {
-    const isCharRight = Math.round(Math.random()) > 0.5;
-    return {
-      key: c,
-      value: c,
-      isRight: isCharRight
-    }
+  const [answer, ansState] = useState([{
+    key: "metaverse",
+    value: "metaqeroe",
+    errors: [4, 7]
   }
-  const [answer, ansState] = useState([..."metaverse".split("").map(ansTestToMap), { key: " ", value: " ", isRight: true }, ..."web3".split("").map(ansTestToMap),]);
+    , {
+    key: "web3",
+    value: "web3",
+    errors: []
+  }]);
 
   const [ansCheck, ansCheckState] = useState([
     {
@@ -48,7 +49,21 @@ export default function Challenge(props) {
     answerBox.current.focus();
   }
 
-  function ansToString(answerChar, index) {
+  function ansToString(ans, index) {
+    let htmlContent = [];
+    Array.from(ans.value).forEach((c, i) => {
+      if (ans.errors.includes(i)) {
+        const spanError = createElement("span", { key: `err-${i}`, className: 'err-try underline' }, c);
+        htmlContent.push(spanError);
+      } else {
+        htmlContent.push(c);
+      }
+    });
+    const ansWord = createElement("word", { key: index, className: 'm-1' }, htmlContent);
+    return ansWord;
+  }
+
+  function ansCheckToString(answerChar, index) {
     if (answerChar.key === " ") return;
     return <letter key={index}
       className={answerChar.isRight ? "try" : "err-try underline"}>{answerChar.value}</letter>;
@@ -63,14 +78,13 @@ export default function Challenge(props) {
   }, [answer]);
 
   function handleAnswer(e) {
-
     // console.log(e.target.value);
   }
 
   // Push text into span
   return (
     <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef}>
-      <p className={`text-left challenge`} ><span className="try">{answer.map(ansToString)}</span><span>{ansCheck.map(ansToString)}</span>{challenge.map(challengeToString)}</p>
+      <p className={`text-left challenge`} ><span className="try">{answer.map(ansToString)}</span><word className="m-1">{ansCheck.map(ansCheckToString)}</word>{challenge.map(challengeToString)}</p>
       <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} ref={answerBox} />
     </div>
   )

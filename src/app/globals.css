@@ -42,6 +42,11 @@ body {
   opacity: 0;
 }
 
+word:nth-child(5n+5)::after {
+  content: "\a";
+  white-space: pre;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

@@ -8,10 +8,10 @@ export default function Home() {
         <p className="text-center text-white"> 無限 </p>
       </div>
 
-      <Challenge className="relative flex place-items-star text-2xl w-9/12 -mt-14 h-64 overflow-hidden font-mono" />
+      <Challenge className="relative flex place-items-start justify-center text-2xl w-9/12 -mt-14 h-64 overflow-hidden font-mono" />
 
       <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left text-white">
-        <p>Footer text here</p>
+        <p>Theme: Gruvbox. Still a WIP</p>
       </div>
     </main>
   );
