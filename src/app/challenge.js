@@ -182,7 +182,7 @@ export default function Challenge(props) {
 
   function displayCurrentChallenge() {
     const arr = challengeAnswer.map(currChallengeToHtml);
-    if (arr[0] !== undefined) {
+    if (arr[arr.length - 1] !== undefined) {
       return (<word className="">{arr}</word>);
     }
     return;
