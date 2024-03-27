@@ -5,6 +5,8 @@
 :root {
   --fg-rgb: #d79921;
   --bg-rgb: #282828;
+  --bg2-rgb: #504945;
+  --bg3-rgb: #665c54;
   --err-fg-rgb: #fb4934;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -24,8 +26,7 @@ body {
 }
 
 .challenge {
-  color: #4d4d4d;
-  opacity: 80%;
+  color: var(--bg2-rgb);
 }
 
 .try {
@@ -36,23 +37,27 @@ body {
   color: var(--err-fg-rgb);
 }
 
+.error-underline {
+  text-decoration-color: var(--err-fg-rgb);
+}
+
 .hidden-text-input {
   color: transparent;
   background-color: transparent;
   opacity: 0;
 }
 
-word {
+.word {
   margin: 0.25rem;
   padding: 0.25rem 0;
 }
 
-word:nth-child(7n+7)::after {
+.word:nth-child(7n+7)::after {
   content: "\a";
   white-space: pre;
 }
 
-caret {
+.caret {
   border-color: var(--fg-rgb);
   border-style: solid;
   border-width: 1.8px;

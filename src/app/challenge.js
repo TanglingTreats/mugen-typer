@@ -3,40 +3,20 @@ import { createElement, useEffect, useState, useRef, useReducer } from "react"
 import Caret from "./caret.js"
 
 export default function Challenge(props) {
-  const [globalIndex, globIndexState] = useState(0);
+  const [hasNewAns, setHasNewAns] = useState(false);
+  const [globalIndex, setGlobIndexState] = useState(0);
+
+  const [scrollHeight, scrollHeightState] = useState(0);
+
+  const challengeBoxRef = useRef(null);
+  const answerBox = useRef(null);
 
   /**
    *  Current challenge string
    */
   const challengeStr = "crypto decentralized meme stock stonk hodl ape GameStop AMC Reddit Robinhood Dogecoin elon tesla Twitter Muskrat quiet quitting great resignation quiet firing layoff recession inflation cost of living supply chain chip shortage climate crisis heat wave drought fire season net zero green energy EV plant-based oat milk cauliflower gnocchi charcuterie grazing board cheugy cringe slay zaddy bussy thirst trap y'all cap no cap fr fr wig go off understood the assignment hot girl walk feral girl summer that's the tweet main character energy unalive sadfishing negging love-bombing gatekeeping cloutlighting sliving going goblin mode crisitunity ambient anxiety";
+  // const challenge = challengeStr.split(" ");
   const [challenge, setChallenge] = useState(challengeStr.split(" "));
-
-  /**
-   * State of all answers
-   */
-  const [answer, setAnswer] = useState([
-    {
-      key: "metaverse",
-      value: "metaqeroe",
-      errors: [4, 7],
-      hasErrors: true,
-    }
-    ,
-    {
-      key: "web3",
-      value: "web3",
-      errors: [],
-      hasErrors: false
-    }
-  ]);
-
-  const [scrollHeight, scrollHeightState] = useState(0);
-  const challengeBoxRef = useRef(null);
-  const answerBox = useRef(null);
-
-  useEffect(() => {
-    challengeBoxRef.current.scrollTo = 50;
-  }, [answer]);
 
   const initChallengeCheck = [
     {
@@ -59,28 +39,22 @@ export default function Challenge(props) {
   /**
    * Challenge-Answer reducer to consolidate text actions
    */
-  const [challengeAnswer, dispatch] = useReducer(ansCheckReducer, initChallengeCheck);
+  const [challengeAnswer, challengeDispatch] = useReducer(challengeReducer, initChallengeCheck);
 
-  function handleAddAns(key, input) {
-    dispatch({
-      type: "add",
-      key: key,
-      value: input
-    });
+  function challengeAnswerLength() {
+    return challengeAnswer.filter((l) => l.value !== "").length;
   }
 
-  function handleDeleteAns() {
-    dispatch({
-      type: "delete",
-    });
+  function challengeAnswerIndex() {
+    return challengeAnswer.length - challengeAnswerLength() - 1;
   }
 
-  function ansCheckReducer(ansChecks, action) {
+  function challengeReducer(ansChecks, action) {
     switch (action.type) {
       case "add":
         if (action.key !== null) {
           return ansChecks.map((ac, index) => {
-            if (ac.key === action.key) {
+            if (action.index === index && ac.key === action.key) {
               ac.value = action.value;
               ac.isRight = action.key === action.value;
             }
@@ -100,12 +74,135 @@ export default function Challenge(props) {
           }
         }
         return [...ansChecks];
+      case "reset":
+        // Clear existing letters
+        ansChecks = action.challenge.split("").map((l, i) => {
+          return {
+            key: l,
+            value: "",
+            isRight: false
+          };
+        });
+        return [...ansChecks];
     }
   }
 
+  function handleAddChallenge(key, input, index) {
+    challengeDispatch({
+      type: "add",
+      key: key,
+      value: input,
+      index: index
+    });
+  }
+
+  function handleDeleteChallenge() {
+    challengeDispatch({
+      type: "delete",
+    });
+  }
+
+  function handleResetChallenge(challenge) {
+    // Reset new answer flag
+    setHasNewAns(false);
+    challengeDispatch({
+      type: "reset",
+      challenge: challenge
+    })
+  }
+
+  const initAnswer = [
+    {
+      key: "metaverse",
+      value: "metaqeroe",
+      errors: [4, 7],
+      empty: [8],
+      hasError: true,
+    },
+    {
+      key: "web3",
+      value: "web3",
+      errors: [],
+      empty: [],
+      hasError: false
+    }
+  ]
+
+  /**
+   * State of all answers
+   */
+  const [answer, answerDispatch] = useReducer(answerReducer, initAnswer);
+
+  function answerReducer(state, action) {
+    switch (action.type) {
+      case "add":
+        return [...state, action.answer];
+      case "remove":
+        return state;
+    }
+  }
+
+  function handleAddAnswer(letters) {
+    let key = "";
+    let value = "";
+    const errors = [];
+    const empty = [];
+    let index = 0;
+    for (const letter of letters) {
+      // Handle right and wrong letters
+      if (letter.value !== "") {
+        value += letter.value;
+      } else if (letter.value === "") {
+        value += letter.key;
+        empty.push(index);
+      } else {
+        console.log("Value is undefined... unexpected behaviour");
+      }
+
+      if (letter.key !== "") {
+        key += letter.key;
+      } else {
+        key += letter.value;
+      }
+
+      // Handle errors
+      if (!letter.isRight && letter.value !== "") {
+        errors.push(index);
+      }
+      ++index;
+    }
+
+    const answer = {
+      key: key,
+      value: value,
+      errors: errors,
+      empty: empty,
+      hasError: (errors.length > 0),
+      hasEmpty: (empty.length > 0)
+    }
+
+    // Set new ans flag before dispatch
+    setHasNewAns(true);
+    answerDispatch({ type: "add", answer: answer });
+  }
+
+  function handleRemoveAnswer() {
+
+  }
+
+  // Apply effects after pushing into answer
+  useEffect(() => {
+    if (hasNewAns) {
+      const poppedWord = challenge.shift()
+      setChallenge(challenge);
+      handleResetChallenge(poppedWord);
+    }
+
+  }, [answer, hasNewAns]);
+
   function handleKeypress(event) {
     if (event.keyCode === 8) {
-      handleDeleteAns();
+      handleDeleteChallenge();
     }
   }
 
@@ -113,33 +210,44 @@ export default function Challenge(props) {
     answerBox.current.focus();
   }
 
-  function ansToString(ans, index) {
+  /**
+   * Convert answer state to html
+   * @param ans {object}
+   * @param index {number} index within answer array
+   */
+  function ansToHtml(ans, index) {
     let htmlContent = [];
-    Array.from(ans.value).forEach((c, i) => {
+    let i = 0;
+    for (const c of ans.value) {
+      // Does error array have index
       if (ans.errors.includes(i)) {
-        const spanError = createElement("span", { key: `err-${i}`, className: 'err-try underline' }, c);
+        const spanError = createElement("span", { key: `err-${i}`, className: 'err-try underline decoration-red' }, c);
         htmlContent.push(spanError);
+      } else if (ans.empty.includes(i)) {
+        const spanEmpty = createElement("span", { key: `empty-${i}`, className: 'challenge underline decoration-red' }, c);
+        htmlContent.push(spanEmpty);
       } else {
         htmlContent.push(c);
       }
-    });
-    const ansWord = createElement("word", { key: index, className: 'try' }, htmlContent);
+      ++i;
+    }
+    const ansWord = createElement("span", { key: index, className: 'try word' }, htmlContent);
     return ansWord;
   }
 
   /**
    *  Convert answer check state to html
-   *  @param answerChar {object}
+   *  @param ansLetter {object}
    *  @param index {number}
    */
-  function ansCheckToHtml(answerChar, index) {
-    if (answerChar.key === " " || answerChar.value === "") return;
+  function ansCheckToHtml(ansLetter, index) {
+    if (ansLetter.key === " " || ansLetter.value === "") return;
     return <span key={index}
-      className={answerChar.isRight ? "try" : "err-try underline"}>{answerChar.value}</span>;
+      className={ansLetter.isRight ? "try" : "err-try underline"}>{ansLetter.value}</span>;
   }
 
   function currChallengeToHtml(currChallenge, index) {
-    if (!(currChallenge.value === "")) return;
+    if (!(currChallenge.value === '')) return;
     return currChallenge.key;
   }
 
@@ -149,7 +257,7 @@ export default function Challenge(props) {
     * @param index {number}
     */
   function challengeToHtml(challenge, index) {
-    return <word className="" key={index}>{challenge}</word>
+    return <span className="word" key={index}>{challenge}</span>
   }
 
   /**
@@ -160,39 +268,41 @@ export default function Challenge(props) {
   function handleAnswer(e) {
     if (e.target.value.includes(" ")) {
       // Pop all in currChallenge into answer with right/wrong state
-      globIndexState((g) => ++g)
+      handleAddAnswer(challengeAnswer);
+      setGlobIndexState((g) => ++g)
     } else {
       const ansChar = e.target.value;
       const challenge = challengeAnswer.find((ca) => ca.value === "");
       const currChar = challenge ? challenge.key : null;
 
-      handleAddAns(currChar, ansChar)
-
-      answerBox.current.value = "";
+      handleAddChallenge(currChar, ansChar, challengeAnswerLength());
     }
+    answerBox.current.value = "";
   }
 
   function displayAnswerCheck() {
     const arr = challengeAnswer.map(ansCheckToHtml);
     if (arr[0] !== undefined) {
-      return (<word className="">{arr}</word>);
+      return (<span className="word">{arr}</span>);
     }
-    return;
+    // Return empty space
+    return <span className="word"></span>;
   }
 
   function displayCurrentChallenge() {
     const arr = challengeAnswer.map(currChallengeToHtml);
     if (arr[arr.length - 1] !== undefined) {
-      return (<word className="">{arr}</word>);
+      return (<span className="word">{arr}</span>);
     }
-    return;
+    // Return empty space
+    return <span className="word"></span>;
   }
 
   // Push text into span
   return (
     <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef}>
       <p className={`text-left challenge`} >
-        {answer.map(ansToString)}
+        {answer.map(ansToHtml)}
         {displayAnswerCheck()}
         <Caret />
         {displayCurrentChallenge()}

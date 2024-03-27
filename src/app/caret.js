@@ -1,5 +1,5 @@
 export default function Caret() {
   return (
-    <caret></caret>
+    <span className="caret"></span>
   );
 }
