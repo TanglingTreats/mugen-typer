@@ -39,13 +39,13 @@ export default function Challenge(props) {
   /**
    * Challenge-Answer reducer to consolidate text actions
    */
-  const [challengeAnswer, challengeDispatch] = useReducer(challengeReducer, initChallengeCheck);
+  const [challengeAnswer, challengeAnsDispatch] = useReducer(challengeAnsReduc, initChallengeCheck);
 
   function challengeAnswerLength() {
     return challengeAnswer.filter((l) => l.value !== "").length;
   }
 
-  function challengeReducer(ansChecks, action) {
+  function challengeAnsReduc(ansChecks, action) {
     switch (action.type) {
       case "add":
         if (action.key !== null) {
@@ -83,8 +83,8 @@ export default function Challenge(props) {
     }
   }
 
-  function handleAddChallenge(key, input, index) {
-    challengeDispatch({
+  function handleAddChallengeAns(key, input, index) {
+    challengeAnsDispatch({
       type: "add",
       key: key,
       value: input,
@@ -92,16 +92,16 @@ export default function Challenge(props) {
     });
   }
 
-  function handleDeleteChallenge() {
-    challengeDispatch({
+  function handleDeleteChallengeAns() {
+    challengeAnsDispatch({
       type: "delete",
     });
   }
 
-  function handleResetChallenge(challenge) {
+  function handleResetChallengeAns(challenge) {
     // Reset new answer flag
     setHasNewAns(false);
-    challengeDispatch({
+    challengeAnsDispatch({
       type: "reset",
       challenge: challenge
     })
@@ -186,19 +186,9 @@ export default function Challenge(props) {
 
   }
 
-  // Apply effects after pushing into answer
-  useEffect(() => {
-    if (hasNewAns) {
-      const poppedWord = challenge.shift()
-      setChallenge(challenge);
-      handleResetChallenge(poppedWord);
-    }
-
-  }, [answer, hasNewAns]);
-
   function handleKeypress(event) {
     if (event.keyCode === 8) {
-      handleDeleteChallenge();
+      handleDeleteChallengeAns();
     }
   }
 
@@ -266,12 +256,18 @@ export default function Challenge(props) {
       // Pop all in currChallenge into answer with right/wrong state
       handleAddAnswer(challengeAnswer);
       setGlobIndexState((g) => ++g)
+
+      // Reset current challenge-answer and pop off challenge
+      const poppedWord = challenge.shift()
+      handleResetChallengeAns(poppedWord);
+      setChallenge(challenge);
+
     } else {
       const ansChar = e.target.value;
       const challenge = challengeAnswer.find((ca) => ca.value === "");
       const currChar = challenge ? challenge.key : null;
 
-      handleAddChallenge(currChar, ansChar, challengeAnswerLength());
+      handleAddChallengeAns(currChar, ansChar, challengeAnswerLength());
     }
     answerBox.current.value = "";
   }
