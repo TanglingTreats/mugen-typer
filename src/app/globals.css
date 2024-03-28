@@ -47,6 +47,7 @@ body {
   opacity: 0;
 }
 
+
 .word {
   margin: 0.25rem;
   padding: 0.25rem 0;
@@ -67,6 +68,11 @@ body {
   animation-duration: 0.8s;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in;
+}
+
+.caret-gap {
+  margin: 0.25rem;
+  padding: 0.25rem 0;
 }
 
 @keyframes caret-blink {

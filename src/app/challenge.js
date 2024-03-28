@@ -45,10 +45,6 @@ export default function Challenge(props) {
     return challengeAnswer.filter((l) => l.value !== "").length;
   }
 
-  function challengeAnswerIndex() {
-    return challengeAnswer.length - challengeAnswerLength() - 1;
-  }
-
   function challengeReducer(ansChecks, action) {
     switch (action.type) {
       case "add":
@@ -283,19 +279,19 @@ export default function Challenge(props) {
   function displayAnswerCheck() {
     const arr = challengeAnswer.map(ansCheckToHtml);
     if (arr[0] !== undefined) {
-      return (<span className="word">{arr}</span>);
+      return (<span className="caret-gap">{arr}</span>);
     }
     // Return empty space
-    return <span className="word"></span>;
+    return <span className="caret-gap"></span>;
   }
 
   function displayCurrentChallenge() {
     const arr = challengeAnswer.map(currChallengeToHtml);
     if (arr[arr.length - 1] !== undefined) {
-      return (<span className="word">{arr}</span>);
+      return (<span className="caret-gap">{arr}</span>);
     }
     // Return empty space
-    return <span className="word"></span>;
+    return <span className="caret-gap"></span>;
   }
 
   // Push text into span
@@ -303,9 +299,11 @@ export default function Challenge(props) {
     <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef}>
       <p className={`text-left challenge`} >
         {answer.map(ansToHtml)}
-        {displayAnswerCheck()}
-        <Caret />
-        {displayCurrentChallenge()}
+        <span className="word">
+          {displayAnswerCheck()}
+          <Caret />
+          {displayCurrentChallenge()}
+        </span>
         {challenge.map(challengeToHtml)}
       </p>
       <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
