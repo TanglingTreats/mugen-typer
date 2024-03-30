@@ -1,0 +1,16 @@
+version: "3.9"
+name: mugen-typer
+services:
+ mugen-typer:
+  container_name: mugen-typer-docker
+  image: mugen-typer-docker
+  build: .
+  ports:
+    - "3000:3000"
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+    interval: 5s
+    timeout: 30s
+    retries: 5
+
+

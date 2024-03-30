@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM --platform=linux/amd64 node:18-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -55,6 +55,9 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# For healthcheck
+RUN apk add --no-cache curl
 
 USER nextjs
 
