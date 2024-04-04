@@ -13,7 +13,7 @@ export default function Home() {
       <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-3 lg:text-left text-white">
         <p>Theme: Gruvbox. Still a WIP.</p>
         <p className="text-center">Thanks for visiting</p>
-        <p className="text-right">Backend not yet connected</p>
+        <p className="text-right">Backend development is in progress.</p>
       </div>
     </main>
   );
