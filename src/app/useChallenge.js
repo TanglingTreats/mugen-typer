@@ -4,10 +4,12 @@ export default function useChallenge() {
   const defString = "This is some default test text. hahahaha";
   const [challenge, setChallenge] = useState([""]);
 
+  const endpoint = process.env.NEXT_PUBLIC_MUGEN_API_URL;
+
   useEffect(() => {
     const getChallenge = async () => {
       try {
-        const res = await fetch("http://localhost:8080/challenges");
+        const res = await fetch(endpoint + "/challenges");
         const data = await res.json();
 
         setChallenge(data.data.split(" "));
