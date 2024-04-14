@@ -4,6 +4,7 @@ import Caret from "./caret.js"
 import useChallenge from "./useChallenge.js";
 
 export default function Challenge(props) {
+  const [textHasLoaded, setTextHasLoaded] = useState(false);
   const [hasNewAns, setHasNewAns] = useState(false);
   const [globalIndex, setGlobIndexState] = useState(0);
 
@@ -19,9 +20,10 @@ export default function Challenge(props) {
   // const challenge = challengeStr.split(" ");
   const [challenge, setChallenge] = useState(challengeStr);
   useEffect(() => {
-    if (challengeStr.length > 0) {
+    if (challengeStr.length > 1) {
       handleResetChallengeAns(challengeStr.shift());
       setChallenge(challengeStr);
+      setTextHasLoaded(true);
     }
   }, [challengeStr]);
 
@@ -268,8 +270,9 @@ export default function Challenge(props) {
   }
 
   // Push text into span
-  return (
-    <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef}>
+  // Show challenge box when text is loaded
+  return !textHasLoaded ? (<p>This is gonna be a super nice loading animation</p>) : (
+    <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef} >
       <p className={`text-left challenge`} >
         {answer.map(ansToHtml)}
         <span className="word">
@@ -280,6 +283,6 @@ export default function Challenge(props) {
         {challenge.map(challengeToHtml)}
       </p>
       <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
-    </div>
-  )
+    </div >
+  );
 }
