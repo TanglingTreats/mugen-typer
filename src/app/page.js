@@ -10,10 +10,14 @@ export default function Home() {
 
       <Challenge className="relative flex place-items-start justify-center text-2xl w-auto -mt-14 h-64 overflow-hidden font-mono" />
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-3 lg:text-left text-white">
-        <p>Theme: Gruvbox. Still a WIP.</p>
+      <div className="mb-32 grid text-center text-xs lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left text-white">
+        <p className="text-center">Theme: Gruvbox. Still a WIP.</p>
         <p className="text-center">Thanks for visiting</p>
-        <p className="text-right">Backend development is in progress.</p>
+        <p className="text-center">Backend development is in progress.</p>
+        <p className="text-center">
+          Credits to Nikolay Talanov for the codepen infinity animation
+          Will likely change it fit my idea better and properly learn SVG
+        </p>
       </div>
     </main>
   );
