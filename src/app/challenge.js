@@ -4,6 +4,7 @@ import Caret from "./caret.js"
 import useChallenge from "./useChallenge.js";
 
 export default function Challenge(props) {
+  const noBreakSpace = "\u0020";
   const [textHasLoaded, setTextHasLoaded] = useState(false);
   const [hasNewAns, setHasNewAns] = useState(false);
   const [globalIndex, setGlobIndexState] = useState(0);
@@ -151,7 +152,7 @@ export default function Challenge(props) {
 
     const answer = {
       key: key,
-      value: value + "\u0020",
+      value: value,
       errors: errors,
       empty: empty,
       hasError: (errors.length > 0),
@@ -184,9 +185,13 @@ export default function Challenge(props) {
    */
   function ansToHtml(ans, index) {
     let htmlContent = [];
+    let hasDash = false;
     let i = 0;
     for (const c of ans.value) {
       // Does error array have index
+      if (c == "-") {
+        hasDash = true;
+      }
       if (ans.errors.includes(i)) {
         const spanError = createElement("span", { key: `err-${i}`, className: 'err-try underline decoration-red' }, c);
         htmlContent.push(spanError);
@@ -196,11 +201,14 @@ export default function Challenge(props) {
       } else {
         htmlContent.push(c);
       }
+      if (i == ans.value.length - 1) {
+        htmlContent.push(noBreakSpace);
+      }
 
       ++i;
     }
 
-    const ansWord = createElement("span", { key: index, className: 'try' }, htmlContent);
+    const ansWord = createElement("span", { key: index, className: hasDash ? 'whitespace-nowrap try' : 'try' }, htmlContent);
     return ansWord;
   }
 
@@ -225,8 +233,16 @@ export default function Challenge(props) {
     * @param challenge {string} 
     * @param index {number}
     */
+  let lastNoWrapIndex = -1;
   function challengeToHtml(challenge, index) {
-    return <span className="" key={index}>{challenge + " "}</span>
+    if (challenge.includes("-")) {
+      lastNoWrapIndex = index
+      return <span key={index} className="whitespace-nowrap">{challenge}</span>
+    }
+    if (lastNoWrapIndex == index - 1) {
+      return noBreakSpace + challenge + noBreakSpace;
+    }
+    return challenge + noBreakSpace;
   }
 
   /**
@@ -258,7 +274,7 @@ export default function Challenge(props) {
   function displayAnswerCheck() {
     const arr = challengeAnswer.map(ansCheckToHtml);
     if (arr[0] !== undefined) {
-      return (<span className="">{arr}</span>);
+      return (<span>{arr}</span>);
     }
     // Return empty space
     return "";
@@ -301,16 +317,14 @@ export default function Challenge(props) {
     </svg>
   ) : (
     <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef} >
-      <div className={`text-left w-80 md:w-5/6 h-48 md:h-64 whitespace-pre-wrap challenge`} >
-        <span >
-          {answer.map(ansToHtml)}
-        </span>
-        <span>
+      <div className={`text-left w-5/6 h-48 md:h-64 whitespace-normal challenge`} >
+        {answer.map(ansToHtml)}
+        <span className="whitespace-nowrap">
           {displayAnswerCheck()}
           <Caret />
           {displayCurrentChallenge()}
         </span>
-        <span>{"\u0020"}</span>
+        {noBreakSpace}
         {challenge.map(challengeToHtml)}
       </div>
       <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
