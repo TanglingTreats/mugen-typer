@@ -42,11 +42,12 @@ export default function Challenge(props) {
   function challengeAnsReduc(ansChecks, action) {
     switch (action.type) {
       case "add":
-        if (action.key !== null) {
+        let actionKey = action.key?.trim();
+        if (actionKey != null) {
           return ansChecks.map((ac, index) => {
-            if (action.index === index && ac.key === action.key) {
+            if (action.index === index && ac.key === actionKey) {
               ac.value = action.value;
-              ac.isRight = action.key === action.value;
+              ac.isRight = actionKey === action.value;
             }
             return ac;
           });
@@ -70,7 +71,8 @@ export default function Challenge(props) {
           return {
             key: l,
             value: "",
-            isRight: false
+            isRight: false,
+            isLast: false
           };
         });
         return [...ansChecks];
@@ -149,7 +151,7 @@ export default function Challenge(props) {
 
     const answer = {
       key: key,
-      value: value,
+      value: value + "\u0020",
       errors: errors,
       empty: empty,
       hasError: (errors.length > 0),
@@ -194,9 +196,11 @@ export default function Challenge(props) {
       } else {
         htmlContent.push(c);
       }
+
       ++i;
     }
-    const ansWord = createElement("span", { key: index, className: 'try word' }, htmlContent);
+
+    const ansWord = createElement("span", { key: index, className: 'try' }, htmlContent);
     return ansWord;
   }
 
@@ -222,7 +226,7 @@ export default function Challenge(props) {
     * @param index {number}
     */
   function challengeToHtml(challenge, index) {
-    return <span className="word" key={index}>{challenge}</span>
+    return <span className="" key={index}>{challenge + " "}</span>
   }
 
   /**
@@ -257,23 +261,23 @@ export default function Challenge(props) {
       return (<span className="">{arr}</span>);
     }
     // Return empty space
-    return <span className=""></span>;
+    return "";
   }
 
   function displayCurrentChallenge() {
     const arr = challengeAnswer.map(currChallengeToHtml);
     if (arr[arr.length - 1] !== undefined) {
-      return (<span className="">{arr}</span>);
+      return arr.join("");
     }
-    // Return empty space
-    return <span className=""></span>;
+    // Return empty
+    return "";
   }
 
   // Push text into span
   // Show challenge box when text is loaded
   return !textHasLoaded ? (
     <svg width="300px" height="200px" viewBox="0 0 187.3 93.7" preserveAspectRatio="xMidYMid meet"
-      style={{left: "50%", top: "50%", position: "absolute", transform: "translate(-50%, -50%) matrix(1, 0, 0, 1, 0, 0)"}}>
+      style={{ left: "50%", top: "50%", position: "absolute", transform: "translate(-50%, -50%) matrix(1, 0, 0, 1, 0, 0)" }}>
       <path stroke="#ededed" id="outline" fill="none" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" strokeMiterlimit="10"
         d="M93.9,46.4
         c9.3,9.5,13.8,17.9,23.5,17.9
@@ -297,15 +301,18 @@ export default function Challenge(props) {
     </svg>
   ) : (
     <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef} >
-      <p className={`text-left challenge`} >
-        {answer.map(ansToHtml)}
-        <span className="word">
+      <div className={`text-left w-80 md:w-5/6 h-48 md:h-64 whitespace-pre-wrap challenge`} >
+        <span >
+          {answer.map(ansToHtml)}
+        </span>
+        <span>
           {displayAnswerCheck()}
           <Caret />
           {displayCurrentChallenge()}
         </span>
+        <span>{"\u0020"}</span>
         {challenge.map(challengeToHtml)}
-      </p>
+      </div>
       <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
     </div >
   );

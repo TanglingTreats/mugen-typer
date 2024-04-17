@@ -34,7 +34,10 @@ body {
 
 .challenge {
   color: var(--bg2-rgb);
-  font-family: var(--font-mononoki-nerd)
+  font-family: var(--font-mononoki-nerd);
+}
+
+div.challenge {
 }
 
 .try {
@@ -61,15 +64,10 @@ body {
   padding: 0.25rem 0;
 }
 
-.word:nth-child(7n+7)::after {
-  content: "\a";
-  white-space: pre;
-}
-
 .caret {
   border-color: var(--fg-rgb);
   border-style: solid;
-  border-width: 1.8px;
+  border-width: 1.5px;
   border-radius: 19%;
 
   animation-name: caret-blink;
