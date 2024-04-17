@@ -28,8 +28,13 @@ body {
   background: var(--bg-rgb);
 }
 
+.title {
+  font-family: var(--font-noto-sans-jp);
+}
+
 .challenge {
   color: var(--bg2-rgb);
+  font-family: var(--font-mononoki-nerd)
 }
 
 .try {
