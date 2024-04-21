@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 
+/**
+  * Gets the challenge text from API
+  * @returns {String[]} Returns an array of space-split strings
+  */
 export default function useChallenge() {
   const defString = "This is some default test text. hahahaha. Something is wrong if this shows up.";
   const [challenge, setChallenge] = useState([""]);
