@@ -201,15 +201,13 @@ export default function Challenge(props) {
       } else {
         htmlContent.push(c);
       }
-      if (i == ans.value.length - 1) {
-        htmlContent.push(noBreakSpace);
-      }
 
       ++i;
     }
 
     const ansWord = createElement("span", { key: index, className: hasDash ? 'whitespace-nowrap try' : 'try' }, htmlContent);
-    return ansWord;
+    const noBreakElem = createElement("span", { key: `space {index}` }, noBreakSpace);
+    return [ansWord, noBreakElem];
   }
 
   /**
@@ -317,7 +315,7 @@ export default function Challenge(props) {
     </svg>
   ) : (
     <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef} >
-      <div className={`text-left w-5/6 h-48 md:h-64 whitespace-normal challenge`} >
+      <div className={`text-left w-5/6 h-2/5 md:h-4/5 whitespace-normal challenge`} >
         {answer.map(ansToHtml)}
         <span className="whitespace-nowrap">
           {displayAnswerCheck()}

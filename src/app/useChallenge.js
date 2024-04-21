@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 export default function useChallenge() {
-  const defString = "This is some default test text. hahahaha";
+  const defString = "This is some default test text. hahahaha. Something is wrong if this shows up.";
   const [challenge, setChallenge] = useState([""]);
 
 
