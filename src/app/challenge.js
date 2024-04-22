@@ -3,11 +3,15 @@ import { createElement, useEffect, useState, useRef, useReducer } from "react"
 import Caret from "./caret.js"
 import useChallenge from "./useChallenge.js";
 import InfiniteLoading from "./infiniteLoading.js";
+import CompleteScreen from "./complete.js";
 
 export default function Challenge(props) {
   const noBreakSpace = "\u0020";
   const [textHasLoaded, setTextHasLoaded] = useState(false);
   const [hasNewAns, setHasNewAns] = useState(false);
+
+  const [isDone, setIsDone] = useState(true);
+
   const [globalIndex, setGlobIndexState] = useState(0);
 
   const [scrollHeight, scrollHeightState] = useState(0);
@@ -257,6 +261,7 @@ export default function Challenge(props) {
       if (challenge.length == 0) {
         handleResetChallengeAns("");
         answerBox.current.blur();
+        setIsDone(true);
       } else {
         // Reset current challenge-answer and pop off challenge
         const poppedWord = challenge.shift()
@@ -296,19 +301,22 @@ export default function Challenge(props) {
   // Show challenge box when text is loaded
   return !textHasLoaded ? (
     <InfiniteLoading />
-  ) : (
-    <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef} >
-      <div className={`text-left w-5/6 h-2/5 md:h-4/5 whitespace-normal challenge`} >
-        {answer.map(ansToHtml)}
-        <span className="whitespace-nowrap">
-          {displayAnswerCheck()}
-          <Caret />
-          {displayCurrentChallenge()}
-        </span>
-        {noBreakSpace}
-        {challenge.map(challengeToHtml)}
-      </div>
-      <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
-    </div >
-  );
+  ) : isDone ? (
+    <CompleteScreen className="text-lg text-center w-screen h-3/5" />
+  )
+    : (
+      <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef} >
+        <div className={`text-left w-4/6 h-2/5 p-2 md:h-4/5 whitespace-normal challenge`} >
+          {answer.map(ansToHtml)}
+          <span className="whitespace-nowrap">
+            {displayAnswerCheck()}
+            <Caret />
+            {displayCurrentChallenge()}
+          </span>
+          {noBreakSpace}
+          {challenge.map(challengeToHtml)}
+        </div>
+        <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
+      </div >
+    );
 }
