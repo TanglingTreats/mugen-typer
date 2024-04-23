@@ -20,7 +20,7 @@ export default function useChallenge() {
       console.log("Oops something went wrong");
       setChallenge(defString.split(" "));
     }
-  });
+  }, []);
 
 
   useEffect(() => {
