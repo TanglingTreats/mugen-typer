@@ -1,5 +1,7 @@
+import styles from "./caret.module.css";
+
 export default function Caret(props) {
   return (
-    <span className="caret h-7 -ml-0.5 absolute"></span>
+    <span className={`${styles.caret} h-7 -ml-0.5 absolute`}></span>
   );
 };

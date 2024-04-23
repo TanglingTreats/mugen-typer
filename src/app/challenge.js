@@ -1,9 +1,10 @@
 "use client"
-import { createElement, useEffect, useState, useRef, useReducer } from "react"
-import Caret from "./_components/caret.js"
+import { createElement, useEffect, useState, useRef, useReducer } from "react";
+import Caret from "./_components/caret.js";
 import useChallenge from "./useChallenge.js";
 import InfiniteLoading from "./_components/infiniteLoading.js";
 import CompleteScreen from "./_components/complete.js";
+import styles from "./challenge.module.css";
 
 export default function Challenge(props) {
   const noBreakSpace = "\u0020";
@@ -197,10 +198,10 @@ export default function Challenge(props) {
         hasDash = true;
       }
       if (ans.errors.includes(i)) {
-        const spanError = createElement("span", { key: `err-${i}`, className: 'err-try underline decoration-red' }, c);
+        const spanError = createElement("span", { key: `err-${i}`, className: `${styles["err-try"]} underline decoration-red` }, c);
         htmlContent.push(spanError);
       } else if (ans.empty.includes(i)) {
-        const spanEmpty = createElement("span", { key: `empty-${i}`, className: 'challenge underline decoration-red' }, c);
+        const spanEmpty = createElement("span", { key: `empty-${i}`, className: `${styles.challenge} underline decoration-red` }, c);
         htmlContent.push(spanEmpty);
       } else {
         htmlContent.push(c);
@@ -209,7 +210,7 @@ export default function Challenge(props) {
       ++i;
     }
 
-    const ansWord = createElement("span", { key: index, className: hasDash ? 'whitespace-nowrap try' : 'try' }, htmlContent);
+    const ansWord = createElement("span", { key: index, className: hasDash ? `whitespace-nowrap ${styles.try}` : styles.try }, htmlContent);
     const noBreakElem = createElement("span", { key: `space {index}` }, noBreakSpace);
     return [ansWord, noBreakElem];
   }
@@ -222,7 +223,7 @@ export default function Challenge(props) {
   function ansCheckToHtml(ansLetter, index) {
     if (ansLetter.key === " " || ansLetter.value === "") return;
     return <span key={index}
-      className={ansLetter.isRight ? "try" : "err-try underline"}>{ansLetter.value}</span>;
+      className={ansLetter.isRight ? styles.try : `${styles["err-try"]} underline`}>{ansLetter.value}</span>;
   }
 
   function currChallengeToHtml(currChallenge, index) {
@@ -306,7 +307,7 @@ export default function Challenge(props) {
   )
     : (
       <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef} >
-        <div className={`text-left w-4/6 h-2/5 p-2 md:h-4/5 whitespace-normal challenge`} >
+        <div className={`text-left w-4/6 p-2 h-[172px] md:h-[204px] whitespace-normal ${styles.challenge}`} >
           {answer.map(ansToHtml)}
           <span className="whitespace-nowrap">
             {displayAnswerCheck()}
@@ -316,7 +317,7 @@ export default function Challenge(props) {
           {noBreakSpace}
           {challenge.map(challengeToHtml)}
         </div>
-        <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={inputHandler} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
+        <input className={`${styles["hidden-text-input"]} cursor-default absolute bottom-0 outline-none bg-transparent w-full`} type="text" autoFocus onChange={inputHandler} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
       </div >
     );
 }

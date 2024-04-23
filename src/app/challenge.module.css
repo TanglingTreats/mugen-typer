@@ -1,0 +1,34 @@
+.title {
+  font-family: var(--font-noto-sans-jp);
+}
+
+.challenge {
+  color: var(--bg2-rgb);
+  font-family: var(--font-mononoki-nerd);
+}
+
+div.challenge {}
+
+.try {
+  color: var(--fg-rgb);
+}
+
+.err-try {
+  color: var(--err-fg-rgb);
+}
+
+.error-underline {
+  text-decoration-color: var(--err-fg-rgb);
+}
+
+.hidden-text-input {
+  color: transparent;
+  background-color: transparent;
+  opacity: 0;
+}
+
+
+.word {
+  margin: 0.25rem;
+  padding: 0.25rem 0;
+}
