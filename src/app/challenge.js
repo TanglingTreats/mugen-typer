@@ -73,18 +73,15 @@ export default function Challenge(props) {
         }
       case "delete":
         let ansChallenge = action.value;
-        for (let i = 0; i < ansChecks.length; i++) {
-          if (ansChecks[i].value == "") {
+        for (let i = ansChecks.length - 1; i >= 0; i--) {
+          if (ansChallenge[i] != null) {
             break;
           }
-          if (ansChallenge[i] == null) {
-            if (ansChecks[i].key == "") {
-              ansChecks.splice(i, 1);
-              --i; // Reset i to previous as total array length has changed
-            } else {
-              ansChecks[i].isRight = false;
-              ansChecks[i].value = "";
-            }
+          if (ansChecks[i].key == "") {
+            ansChecks.splice(i, 1);
+          } else {
+            ansChecks[i].isRight = false;
+            ansChecks[i].value = "";
           }
         }
         return [...ansChecks];
