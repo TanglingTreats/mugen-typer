@@ -42,7 +42,7 @@ export default function Challenge(props) {
   /**
    * Challenge-Answer reducer to consolidate text actions
    */
-  const [challengeAnswer, challengeAnsDispatch] = useReducer(challengeAnsReduc, initChallengeCheck);
+  const [challengeAnswer, challengeAnsDispatch] = useReducer(challengeAnsReducer, initChallengeCheck);
 
   function challengeAnswerLength() {
     return challengeAnswer.filter((l) => l.value !== "").length;
@@ -51,29 +51,40 @@ export default function Challenge(props) {
   /**
    * Reducer for challenge-answer
    */
-  function challengeAnsReduc(ansChecks, action) {
+  function challengeAnsReducer(ansChecks, action) {
     switch (action.type) {
       case "add":
         let actionKey = action.key?.trim();
+        let result = ansChecks.map((ac, index) => {
+          if (action.index === index && ac.key === actionKey) {
+            ac.value = action.value;
+            ac.isRight = actionKey === action.value;
+            ac.isLast = false;
+          } else {
+            ac.isLast = false;
+          }
+          return ac;
+        });
         if (actionKey != null) {
-          return ansChecks.map((ac, index) => {
-            if (action.index === index && ac.key === actionKey) {
-              ac.value = action.value;
-              ac.isRight = actionKey === action.value;
-            }
-            return ac;
-          });
+          result[result.length - 1].isLast = true;
+          return [...result];
         } else {
-          return [...ansChecks, { key: "", value: action.value, isRight: false }];
+          return [...ansChecks, { key: "", value: action.value, isRight: false, isLast: true }];
         }
       case "delete":
-        let lastElem = ansChecks[ansChecks.length - 1];
-        if (lastElem.key === "") {
-          ansChecks.pop();
-        } else {
-          lastElem = ansChecks.findLast((ac) => ac.value !== "");
-          if (lastElem != null) {
-            lastElem.value = "";
+        let ansChallenge = action.value;
+        for (let i = 0; i < ansChecks.length; i++) {
+          if (ansChecks[i].value == "") {
+            break;
+          }
+          if (ansChallenge[i] == null) {
+            if (ansChecks[i].key == "") {
+              ansChecks.splice(i, 1);
+              --i; // Reset i to previous as total array length has changed
+            } else {
+              ansChecks[i].isRight = false;
+              ansChecks[i].value = "";
+            }
           }
         }
         return [...ansChecks];
@@ -100,9 +111,10 @@ export default function Challenge(props) {
     });
   }
 
-  function handleDeleteChallengeAns() {
+  function handleDeleteChallengeAns(input) {
     challengeAnsDispatch({
       type: "delete",
+      value: input
     });
   }
 
@@ -113,6 +125,19 @@ export default function Challenge(props) {
       type: "reset",
       challenge: challenge
     })
+  }
+
+  /**
+   * Returns the number of filled 'values'
+   */
+  function getCurrentChallengeAns() {
+    let count = 0;
+    challengeAnswer.forEach((ca) => {
+      if (ca.value != "") {
+        ++count;
+      }
+    })
+    return count;
   }
 
   const initAnswer = []
@@ -203,9 +228,10 @@ export default function Challenge(props) {
   }
 
   function handleKeypress(event) {
-    if (event.keyCode === 8) {
-      handleDeleteChallengeAns();
+    if (event.keyCode >= 37 && event.keyCode <= 40) {
+      event.preventDefault();
     }
+    if (event.key === 8) { }
   }
 
   function handleOnClick() {
@@ -267,7 +293,9 @@ export default function Challenge(props) {
   }
 
   function currChallengeToHtml(currChallenge, index) {
-    if (!(currChallenge.value === '')) return;
+    if (currChallenge.value !== '') {
+      return;
+    }
     return currChallenge.key;
   }
 
@@ -310,15 +338,21 @@ export default function Challenge(props) {
         handleResetChallengeAns(poppedWord);
         setChallenge(challenge);
       }
-
+      // Reset input box after jumping
+      e.target.value = "";
     } else {
-      const ansChar = e.target.value;
-      const challenge = challengeAnswer.find((ca) => ca.value === "");
-      const currChar = challenge ? challenge.key : null;
+      const ans = e.target.value;
+      const single = ans[ans.length - 1];
+      if (ans.length > getCurrentChallengeAns()) {
 
-      handleAddChallengeAns(currChar, ansChar, challengeAnswerLength());
+        const challenge = challengeAnswer.find((ca) => ca.value === "");
+        const currChar = challenge ? challenge.key : null;
+
+        handleAddChallengeAns(currChar, single, challengeAnswerLength());
+      } else {
+        handleDeleteChallengeAns(ans)
+      }
     }
-    answerBox.current.value = "";
   }
 
   function displayAnswerCheck() {
@@ -358,7 +392,7 @@ export default function Challenge(props) {
           {noBreakSpace}
           {challenge.map(challengeToHtml)}
         </div>
-        <input className={`${styles["hidden-text-input"]} cursor-default absolute bottom-0 outline-none bg-transparent w-full`} type="text" autoFocus onChange={inputHandler} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
+        <input className={`${styles["hidden-text-input"]} cursor-default absolute bottom-0 outline-none bg-transparent w-full`} type="text" autoFocus onChange={inputHandler} onKeyDown={handleKeypress} ref={answerBox} />
       </div >
     );
 }
