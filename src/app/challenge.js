@@ -1,16 +1,16 @@
 "use client"
 import { createElement, useEffect, useState, useRef, useReducer } from "react"
-import Caret from "./caret.js"
+import Caret from "./_components/caret.js"
 import useChallenge from "./useChallenge.js";
-import InfiniteLoading from "./infiniteLoading.js";
-import CompleteScreen from "./complete.js";
+import InfiniteLoading from "./_components/infiniteLoading.js";
+import CompleteScreen from "./_components/complete.js";
 
 export default function Challenge(props) {
   const noBreakSpace = "\u0020";
   const [textHasLoaded, setTextHasLoaded] = useState(false);
   const [hasNewAns, setHasNewAns] = useState(false);
 
-  const [isDone, setIsDone] = useState(true);
+  const [isDone, setIsDone] = useState(false);
 
   const [globalIndex, setGlobIndexState] = useState(0);
 
@@ -252,7 +252,7 @@ export default function Challenge(props) {
     * For every user input, check string against letters and push into currChallenge
     * @param e {Event}
     */
-  function handleAnswer(e) {
+  function inputHandler(e) {
     if (e.target.value.includes(" ")) {
       // Pop all in currChallenge into answer with right/wrong state
       handleAddAnswer(challengeAnswer);
@@ -316,7 +316,7 @@ export default function Challenge(props) {
           {noBreakSpace}
           {challenge.map(challengeToHtml)}
         </div>
-        <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={handleAnswer} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
+        <input className="hidden-text-input absolute bottom-0 outline-none bg-transparent w-full" type="text" autoFocus onChange={inputHandler} onKeyDown={handleKeypress} maxLength={1} ref={answerBox} />
       </div >
     );
 }

@@ -9,7 +9,7 @@ export default function Home() {
 
       <Challenge className="relative flex place-items-start justify-center text-2xl w-screen -mt-14 h-48 md:h-64 overflow-hidden" />
 
-      <div className="mb-2 md:mb-32 grid text-center text-xs lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left text-white">
+      <div className="mb-2 grid text-center text-xs lg:max-w-5xl lg:w-full lg:grid-cols-4 lg:text-left text-white">
         <p className="text-center">Theme: Gruvbox. Still a WIP.</p>
         <p className="text-center">Thanks for visiting</p>
         <p className="text-center">Backend development is in progress.</p>
