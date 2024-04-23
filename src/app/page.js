@@ -7,7 +7,7 @@ export default function Home() {
         <p className="text-center text-white title"> 無限 </p>
       </div>
 
-      <Challenge className="relative flex place-items-start justify-center text-2xl w-screen -mt-14 h-[172px] md:h-[204px] overflow-hidden" />
+      <Challenge className="relative flex place-items-start justify-center text-2xl w-screen -mt-14 h-[174px] md:h-[204px] overflow-hidden" />
 
       <div className="mb-2 grid text-center text-xs lg:max-w-5xl lg:w-full lg:grid-cols-4 lg:text-left text-white">
         <p className="text-center">Theme: Gruvbox. Still a WIP.</p>

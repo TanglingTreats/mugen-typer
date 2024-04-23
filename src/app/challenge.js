@@ -307,7 +307,7 @@ export default function Challenge(props) {
   )
     : (
       <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef} >
-        <div className={`text-left w-4/6 p-2 h-[172px] md:h-[204px] whitespace-normal ${styles.challenge}`} >
+        <div className={`text-left w-4/6 p-2 h-[174px] md:h-[204px] whitespace-normal ${styles.challenge}`} >
           {answer.map(ansToHtml)}
           <span className="whitespace-nowrap">
             {displayAnswerCheck()}
