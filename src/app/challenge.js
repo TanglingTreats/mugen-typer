@@ -17,13 +17,16 @@ export default function Challenge(props) {
 
   const [scrollHeight, scrollHeightState] = useState(0);
 
+  const [score, setScore] = useState(0);
+
   const challengeBoxRef = useRef(null);
   const answerBox = useRef(null);
+
 
   /**
    *  Current challenge string
    */
-  const challengeStr = useChallenge();
+  const [challengeStr, refetch] = useChallenge();
   const [challenge, setChallenge] = useState(challengeStr);
   useEffect(() => {
     if (challengeStr.length > 1) {
@@ -45,6 +48,9 @@ export default function Challenge(props) {
     return challengeAnswer.filter((l) => l.value !== "").length;
   }
 
+  /**
+   * Reducer for challenge-answer
+   */
   function challengeAnsReduc(ansChecks, action) {
     switch (action.type) {
       case "add":
@@ -114,7 +120,7 @@ export default function Challenge(props) {
   /**
    * State of all answers
    */
-  const [answer, answerDispatch] = useReducer(answerReducer, initAnswer);
+  const [answers, answerDispatch] = useReducer(answerReducer, initAnswer);
 
   function answerReducer(state, action) {
     switch (action.type) {
@@ -122,6 +128,8 @@ export default function Challenge(props) {
         return [...state, action.answer];
       case "remove":
         return state;
+      case "reset":
+        return [];
     }
   }
 
@@ -169,8 +177,29 @@ export default function Challenge(props) {
     answerDispatch({ type: "add", answer: answer });
   }
 
+  /**
+   * Delete previous answers if possible
+   */
   function handleRemoveAnswer() {
 
+  }
+
+  function handleResetAnswer() {
+    answerDispatch({ type: "reset" });
+  }
+
+  /**
+   * Count score metric
+   */
+  function handleChallengeEnd() {
+    let score = 0;
+    answers.forEach((ans) => {
+      if (!ans.hasError && !ans.hasEmpty) {
+        ++score;
+      }
+    })
+
+    setScore(score);
   }
 
   function handleKeypress(event) {
@@ -181,6 +210,17 @@ export default function Challenge(props) {
 
   function handleOnClick() {
     answerBox.current.focus();
+  }
+
+  /**
+   * Reset challenge state
+   */
+  function handleChallengeReset() {
+    setIsDone(false);
+    setScore(0);
+    handleResetAnswer();
+    refetch();
+    setTextHasLoaded(false);
   }
 
   /**
@@ -261,6 +301,7 @@ export default function Challenge(props) {
 
       if (challenge.length == 0) {
         handleResetChallengeAns("");
+        handleChallengeEnd();
         answerBox.current.blur();
         setIsDone(true);
       } else {
@@ -303,12 +344,12 @@ export default function Challenge(props) {
   return !textHasLoaded ? (
     <InfiniteLoading />
   ) : isDone ? (
-    <CompleteScreen className="text-lg text-center w-screen h-3/5" />
+    <CompleteScreen className="text-lg text-center w-screen h-3/5" score={score} resetChallenge={handleChallengeReset} />
   )
     : (
       <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef} >
         <div className={`text-left w-4/6 p-2 h-[174px] md:h-[204px] whitespace-normal ${styles.challenge}`} >
-          {answer.map(ansToHtml)}
+          {answers.map(ansToHtml)}
           <span className="whitespace-nowrap">
             {displayAnswerCheck()}
             <Caret />

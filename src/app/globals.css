@@ -7,7 +7,7 @@
   --bg-rgb: #282828;
   --bg2-rgb: #504945;
   --bg3-rgb: #665c54;
-  --err-fg-rgb: #fb4934;
+  --err-fg-rgb: #cc241d;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 
@@ -26,6 +26,14 @@
 body {
   color: var(--fg-rgb);
   background: var(--bg-rgb);
+}
+
+button {
+  border-color: var(--bg2-rgb);
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 7px;
+  padding: 0.5rem 1rem;
 }
 
 @layer utilities {
