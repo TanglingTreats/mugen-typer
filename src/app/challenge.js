@@ -24,10 +24,22 @@ export default function Challenge(props) {
   const answerBox = useRef(null);
 
   const [isFirstLoad, setFirstLoad] = useState(true);
-  const caret = useRef();
+  const caret = useRef(null);
   const [caretTop, setCaretTop] = useState(0);
 
   const [scrollHeight, scrollDispatch] = useReducer(scrollReducer, 0);
+
+  useEffect(() => {
+    if (caretTop == undefined || caretTop == 0) {
+      setCaretTop(caret.current?.getBoundingClientRect().top);
+    }
+  }, [textHasLoaded]);
+
+  useEffect(() => {
+    if (caret.current?.getBoundingClientRect().top > caretTop) {
+      handleScrollUp();
+    }
+  }, [caret.current?.getBoundingClientRect().top]);
 
   function scrollReducer(state, action) {
     switch (action.type) {
@@ -48,15 +60,12 @@ export default function Challenge(props) {
   }
 
   function checkCaret() {
+    console.log(caret.current.getBoundingClientRect().top, caretTop);
     if (isFirstLoad) {
-      setFirstLoad(false);
       setCaretTop(caret.current.getBoundingClientRect().top);
     } else {
       if (caret.current.getBoundingClientRect().top > caretTop) {
-        handleScrollUp();
-        setCaretTop(caret.current.getBoundingClientRect().top);
-      } else if (caret.current.getBoundingClientRect().top < caretTop) {
-        setCaretTop(caret.current.getBoundingClientRect().top);
+      } else if (caret.current.getBoundingClientRect().top <= caretTop) {
       }
     }
   }
@@ -383,7 +392,6 @@ export default function Challenge(props) {
 
       // Reset input box after jumping
       e.target.value = "";
-      checkCaret();
 
     } else {
       const ans = e.target.value;
