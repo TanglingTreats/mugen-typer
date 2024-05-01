@@ -7,6 +7,8 @@ import CompleteScreen from "./_components/complete.js";
 import styles from "./challenge.module.css";
 
 export default function Challenge(props) {
+  const lineHeight = 2; // Line height in rem
+
   const noBreakSpace = "\u0020";
   const [textHasLoaded, setTextHasLoaded] = useState(false);
   const [hasNewAns, setHasNewAns] = useState(false);
@@ -15,13 +17,49 @@ export default function Challenge(props) {
 
   const [globalIndex, setGlobIndexState] = useState(0);
 
-  const [scrollHeight, scrollHeightState] = useState(0);
 
   const [score, setScore] = useState(0);
 
   const challengeBoxRef = useRef(null);
   const answerBox = useRef(null);
 
+  const [isFirstLoad, setFirstLoad] = useState(true);
+  const caret = useRef();
+  const [caretTop, setCaretTop] = useState(0);
+
+  const [scrollHeight, scrollDispatch] = useReducer(scrollReducer, 0);
+
+  function scrollReducer(state, action) {
+    switch (action.type) {
+      case "scroll":
+        return state + lineHeight;
+      case "reset":
+        return 0;
+    }
+  }
+  /**
+   * Change the height of text
+   */
+  function handleScrollUp() {
+    scrollDispatch({ type: "scroll" });
+  }
+  function handleScrollReset() {
+    scrollDispatch({ type: "reset" });
+  }
+
+  function checkCaret() {
+    if (isFirstLoad) {
+      setFirstLoad(false);
+      setCaretTop(caret.current.getBoundingClientRect().top);
+    } else {
+      if (caret.current.getBoundingClientRect().top > caretTop) {
+        handleScrollUp();
+        setCaretTop(caret.current.getBoundingClientRect().top);
+      } else if (caret.current.getBoundingClientRect().top < caretTop) {
+        setCaretTop(caret.current.getBoundingClientRect().top);
+      }
+    }
+  }
 
   /**
    *  Current challenge string
@@ -39,6 +77,7 @@ export default function Challenge(props) {
 
   const initChallengeCheck = [];
 
+  // -------- Challenge-Answer Reducer ---------
   /**
    * Challenge-Answer reducer to consolidate text actions
    */
@@ -123,6 +162,7 @@ export default function Challenge(props) {
       challenge: challenge
     })
   }
+  // -------- -------- ---------
 
   /**
    * Returns the number of filled 'values'
@@ -137,6 +177,7 @@ export default function Challenge(props) {
     return count;
   }
 
+  // -------- Answers Reducer --------
   const initAnswer = []
 
   /**
@@ -209,6 +250,7 @@ export default function Challenge(props) {
   function handleResetAnswer() {
     answerDispatch({ type: "reset" });
   }
+  // -------- -------- --------
 
   /**
    * Count score metric
@@ -234,6 +276,7 @@ export default function Challenge(props) {
   function handleOnClick() {
     answerBox.current.focus();
   }
+
 
   /**
    * Reset challenge state
@@ -329,14 +372,19 @@ export default function Challenge(props) {
         handleChallengeEnd();
         answerBox.current.blur();
         setIsDone(true);
+        handleScrollReset();
+
       } else {
         // Reset current challenge-answer and pop off challenge
         const poppedWord = challenge.shift()
         handleResetChallengeAns(poppedWord);
         setChallenge(challenge);
       }
+
       // Reset input box after jumping
       e.target.value = "";
+      checkCaret();
+
     } else {
       const ans = e.target.value;
       const single = ans[ans.length - 1];
@@ -379,11 +427,11 @@ export default function Challenge(props) {
   )
     : (
       <div className={`${props.className}`} onClick={handleOnClick} ref={challengeBoxRef} >
-        <div className={`text-left w-4/6 p-2 h-[174px] md:h-[204px] whitespace-normal ${styles.challenge}`} >
+        <div style={{ top: `-${scrollHeight}.3rem` }} className={`absolute text-left w-4/6 p-2 h-[174px] md:h-[204px] whitespace-normal ${styles.challenge}`} >
           {answers.map(ansToHtml)}
           <span className="whitespace-nowrap">
             {displayAnswerCheck()}
-            <Caret />
+            <Caret ref={caret} />
             {displayCurrentChallenge()}
           </span>
           {noBreakSpace}
