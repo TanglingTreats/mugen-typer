@@ -23,18 +23,23 @@ export default function Challenge(props) {
   const challengeBoxRef = useRef(null);
   const answerBox = useRef(null);
 
-  const [isFirstLoad, setFirstLoad] = useState(true);
+  // ------ Handle scroll up effect ------
   const caret = useRef(null);
   const [caretTop, setCaretTop] = useState(0);
-
   const [scrollHeight, scrollDispatch] = useReducer(scrollReducer, 0);
 
+  /**
+   * Set caret top position on first load
+   */
   useEffect(() => {
     if (caretTop == undefined || caretTop == 0) {
       setCaretTop(caret.current?.getBoundingClientRect().top);
     }
   }, [textHasLoaded]);
 
+  /**
+   * Scroll up when caret moves to next line effect
+   */
   useEffect(() => {
     if (caret.current?.getBoundingClientRect().top > caretTop) {
       handleScrollUp();
@@ -49,6 +54,7 @@ export default function Challenge(props) {
         return 0;
     }
   }
+
   /**
    * Change the height of text
    */
@@ -59,20 +65,7 @@ export default function Challenge(props) {
     scrollDispatch({ type: "reset" });
   }
 
-  function checkCaret() {
-    console.log(caret.current.getBoundingClientRect().top, caretTop);
-    if (isFirstLoad) {
-      setCaretTop(caret.current.getBoundingClientRect().top);
-    } else {
-      if (caret.current.getBoundingClientRect().top > caretTop) {
-      } else if (caret.current.getBoundingClientRect().top <= caretTop) {
-      }
-    }
-  }
-
-  /**
-   *  Current challenge string
-   */
+  // ------ Current challenge string ------
   const [challengeStr, refetch] = useChallenge();
   const [challenge, setChallenge] = useState(challengeStr);
   useEffect(() => {
@@ -83,14 +76,11 @@ export default function Challenge(props) {
     }
   }, [challengeStr]);
 
-
-  const initChallengeCheck = [];
-
   // -------- Challenge-Answer Reducer ---------
   /**
    * Challenge-Answer reducer to consolidate text actions
    */
-  const [challengeAnswer, challengeAnsDispatch] = useReducer(challengeAnsReducer, initChallengeCheck);
+  const [challengeAnswer, challengeAnsDispatch] = useReducer(challengeAnsReducer, []);
 
   function challengeAnswerLength() {
     return challengeAnswer.filter((l) => l.value !== "").length;
@@ -187,12 +177,10 @@ export default function Challenge(props) {
   }
 
   // -------- Answers Reducer --------
-  const initAnswer = []
-
   /**
    * State of all answers
    */
-  const [answers, answerDispatch] = useReducer(answerReducer, initAnswer);
+  const [answers, answerDispatch] = useReducer(answerReducer, []);
 
   function answerReducer(state, action) {
     switch (action.type) {
@@ -275,6 +263,7 @@ export default function Challenge(props) {
     setScore(score);
   }
 
+  // ------ Input handlers ------
   function handleKeypress(event) {
     if (event.keyCode >= 37 && event.keyCode <= 40) {
       event.preventDefault();
@@ -296,56 +285,6 @@ export default function Challenge(props) {
     handleResetAnswer();
     refetch();
     setTextHasLoaded(false);
-  }
-
-  /**
-   * Convert answer state to html
-   * @param ans {object}
-   * @param index {number} index within answer array
-   */
-  function ansToHtml(ans, index) {
-    let htmlContent = [];
-    let hasDash = false;
-    let i = 0;
-    for (const c of ans.value) {
-      // Does error array have index
-      if (c == "-") {
-        hasDash = true;
-      }
-      if (ans.errors.includes(i)) {
-        const spanError = createElement("span", { key: `err-${i}`, className: `${styles["err-try"]} underline decoration-red` }, c);
-        htmlContent.push(spanError);
-      } else if (ans.empty.includes(i)) {
-        const spanEmpty = createElement("span", { key: `empty-${i}`, className: `${styles.challenge} underline decoration-red` }, c);
-        htmlContent.push(spanEmpty);
-      } else {
-        htmlContent.push(c);
-      }
-
-      ++i;
-    }
-
-    const ansWord = createElement("span", { key: index, className: hasDash ? `whitespace-nowrap ${styles.try}` : styles.try }, htmlContent);
-    const noBreakElem = createElement("span", { key: `space {index}` }, noBreakSpace);
-    return [ansWord, noBreakElem];
-  }
-
-  /**
-   *  Convert answer check state to html
-   *  @param ansLetter {object}
-   *  @param index {number}
-   */
-  function ansCheckToHtml(ansLetter, index) {
-    if (ansLetter.key === " " || ansLetter.value === "") return;
-    return <span key={index}
-      className={ansLetter.isRight ? styles.try : `${styles["err-try"]} underline`}>{ansLetter.value}</span>;
-  }
-
-  function currChallengeToHtml(currChallenge, index) {
-    if (currChallenge.value !== '') {
-      return;
-    }
-    return currChallenge.key;
   }
 
   /**
@@ -406,6 +345,57 @@ export default function Challenge(props) {
         handleDeleteChallengeAns(ans)
       }
     }
+  }
+
+  // ------ Convert models to HTML ------
+  /**
+   * Convert answer state to html
+   * @param ans {object}
+   * @param index {number} index within answer array
+   */
+  function ansToHtml(ans, index) {
+    let htmlContent = [];
+    let hasDash = false;
+    let i = 0;
+    for (const c of ans.value) {
+      // Does error array have index
+      if (c == "-") {
+        hasDash = true;
+      }
+      if (ans.errors.includes(i)) {
+        const spanError = createElement("span", { key: `err-${i}`, className: `${styles["err-try"]} underline decoration-red` }, c);
+        htmlContent.push(spanError);
+      } else if (ans.empty.includes(i)) {
+        const spanEmpty = createElement("span", { key: `empty-${i}`, className: `${styles.challenge} underline decoration-red` }, c);
+        htmlContent.push(spanEmpty);
+      } else {
+        htmlContent.push(c);
+      }
+
+      ++i;
+    }
+
+    const ansWord = createElement("span", { key: index, className: hasDash ? `whitespace-nowrap ${styles.try}` : styles.try }, htmlContent);
+    const noBreakElem = createElement("span", { key: `space {index}` }, noBreakSpace);
+    return [ansWord, noBreakElem];
+  }
+
+  /**
+   *  Convert answer check state to html
+   *  @param ansLetter {object}
+   *  @param index {number}
+   */
+  function ansCheckToHtml(ansLetter, index) {
+    if (ansLetter.key === " " || ansLetter.value === "") return;
+    return <span key={index}
+      className={ansLetter.isRight ? styles.try : `${styles["err-try"]} underline`}>{ansLetter.value}</span>;
+  }
+
+  function currChallengeToHtml(currChallenge, index) {
+    if (currChallenge.value !== '') {
+      return;
+    }
+    return currChallenge.key;
   }
 
   function displayAnswerCheck() {
